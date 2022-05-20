@@ -1,0 +1,74 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Player.tscn" type="PackedScene" id=1]
+[ext_resource path="res://PlayerCamera.gd" type="Script" id=2]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 574, 30 )
+
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 42, 30 )
+
+[node name="Node2D" type="Node2D"]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+position = Vector2( 436, 395 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+shape = SubResource( 1 )
+
+[node name="StaticBody2D4" type="StaticBody2D" parent="."]
+position = Vector2( 1535, 376 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D4"]
+shape = SubResource( 1 )
+
+[node name="StaticBody2D5" type="StaticBody2D" parent="."]
+position = Vector2( -926, 102 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D5"]
+shape = SubResource( 1 )
+
+[node name="StaticBody2D3" type="StaticBody2D" parent="."]
+position = Vector2( 154, 343 )
+rotation = 0.439082
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D3"]
+shape = SubResource( 1 )
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="."]
+position = Vector2( 611, 256 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D2"]
+shape = SubResource( 2 )
+
+[node name="Player" parent="." instance=ExtResource( 1 )]
+position = Vector2( 419, 273 )
+air_accel = 500.0
+slowdown_factor = 3.0
+gravity = 1000.0
+jump_hold_factor = 0.3
+coyote_time_window = 7
+
+[node name="Camera2D" type="Camera2D" parent="."]
+current = true
+script = ExtResource( 2 )
+target_node = NodePath("../Player")
+follow_speed = 5
+look_ahead_h = 200
+look_ahead_accel = 7.0
+look_ahead_speed = 3.0
+
+[node name="Tween" type="Tween" parent="Camera2D"]
