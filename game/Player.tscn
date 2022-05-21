@@ -20,3 +20,6 @@ region_rect = Rect2( 1063.59, 943.029, 327.004, 331.128 )
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2( 0, -21 )
 shape = SubResource( 1 )
+
+[node name="Position2D" type="Position2D" parent="."]
+position = Vector2( -1, -21 )

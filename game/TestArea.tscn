@@ -58,8 +58,9 @@ shape = SubResource( 2 )
 position = Vector2( 419, 273 )
 air_accel = 500.0
 slowdown_factor = 3.0
-gravity = 1000.0
-jump_hold_factor = 0.3
+gravity = 1500.0
+jump_accel = 400.0
+jump_hold_factor = 0.4
 coyote_time_window = 7
 
 [node name="Camera2D" type="Camera2D" parent="."]

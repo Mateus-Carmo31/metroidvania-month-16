@@ -1,5 +1,6 @@
 extends KinematicBody2D
 
+onready var bullet = preload("res://Bullet.tscn")
 class_name Player
 
 export var ground_accel			: float = 800
@@ -18,6 +19,7 @@ var is_jumping : bool = false
 var jump_key_held : bool = false
 var coyote_timer : float = 0
 var jump_buffer_timer : float = 0
+var b
 
 enum {FACING_LEFT, FACING_RIGHT}
 var facing = FACING_RIGHT
@@ -34,7 +36,7 @@ func _ready():
 func _physics_process(delta):
 
 	var input := Vector2.ZERO
-
+		
 	if Input.is_action_pressed("move_left"):
 		input += Vector2.LEFT
 		facing = FACING_LEFT
@@ -48,6 +50,7 @@ func _physics_process(delta):
 
 	if Input.is_action_just_released("jump"):
 		jump_key_held = false
+
 
 	# Speed damping
 	if is_on_floor():
@@ -87,6 +90,7 @@ func _physics_process(delta):
 	# print("Coyote window: ", coyote_timer, " Jump Buffer window: ", jump_buffer_timer)
 
 
+
 func _process_input(input : Vector2, grounded : bool, delta : float):
 
 	var dir = input.normalized()
@@ -103,3 +107,19 @@ func _process_input(input : Vector2, grounded : bool, delta : float):
 	if not is_jumping and jump_buffer_timer > 0 and (grounded or coyote_timer > 0):
 		velocity.y = -jump_accel
 		is_jumping = true
+	
+	#shoot
+	if Input.is_action_just_pressed("fire"):
+		shoot()
+		
+		
+func shoot():
+		b = bullet.instance()
+		get_parent().add_child(b)
+		b.global_position = $Position2D.global_position
+		if facing == FACING_LEFT:
+			b.dir = Vector2(-1,0)
+		if Input.is_action_pressed("look_up"):
+			b.dir = Vector2(0,-1) 
+		if Input.is_action_pressed("look_down") and not is_on_floor():
+			b.dir = Vector2(0,1) 
