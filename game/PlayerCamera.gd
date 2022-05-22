@@ -1,7 +1,6 @@
 extends Camera2D
 
 export var follow_target = true
-export(NodePath) var target_node
 export var follow_speed = 20
 export var look_ahead_h = 20
 export var look_ahead_v = 20
@@ -24,15 +23,13 @@ func _ready():
 	else:
 		mode = STATIC_MODE
 
-	target = get_node(target_node)
-
 	if not target:
 		mode = STATIC_MODE
 		print("NO TARGET SET!")
 
 func _physics_process(delta):
 
-	if mode == FOLLOW_MODE:
+	if mode == FOLLOW_MODE and target:
 
 		# Takes out offset to update position itself
 		position -= lookahead_offset
@@ -62,3 +59,8 @@ func _physics_process(delta):
 
 	else:
 		pass
+
+func set_target(node, follow = true):
+	target = node
+	if follow:
+		mode = FOLLOW_MODE
