@@ -3,30 +3,34 @@ extends KinematicBody2D
 onready var bullet = preload("res://Bullet.tscn")
 class_name Player
 
-export var ground_accel			: float = 800
-export var ground_speed			: float = 200
-export var air_accel			: float = 500
-export var air_speed			: float = 200
-export var slowdown_factor		: float = 3
-export var gravity				: float = 1500
-export var jump_accel			: float = 400
-export var jump_hold_factor		: float = 0.4
-export var coyote_time_window	: int	= 7
-export var jump_buffer_window	: int	= 4
+export var ground_accel				: float = 800
+export var ground_speed				: float = 200
+export var air_accel				: float = 500
+export var air_speed				: float = 200
+export var slowdown_factor			: float = 3
+export var gravity					: float = 1500
+export var jump_accel				: float = 400
+export var jump_hold_factor			: float = 0.4
+export var coyote_time_window		: int	= 7
+export var jump_buffer_window		: int	= 4
+export var wall_jump_buffer_window	: int	= 3
 
 var velocity : Vector2
 var is_jumping : bool = false
 var jump_key_held : bool = false
 var coyote_timer : float = 0
 var jump_buffer_timer : float = 0
-var b
 
-enum {FACING_LEFT, FACING_RIGHT}
+enum {FACING_LEFT, FACING_RIGHT, FACING_UP, FACING_DOWN}
 var facing = FACING_RIGHT
 
 var touched_floor = false
 
+enum Element {None, Fire, Grass, Ice}
+var current_element = 0
+
 # TODO: add player element state!
+# TODO: increase player size
 # TODO: add firing
 # TODO: find some way to reduce slide
 
@@ -90,7 +94,6 @@ func _physics_process(delta):
 	jump_buffer_timer = max(jump_buffer_timer - 1, 0)
 
 
-
 func _process_input(input : Vector2, grounded : bool, delta : float):
 
 	var dir = input.normalized()
@@ -107,9 +110,13 @@ func _process_input(input : Vector2, grounded : bool, delta : float):
 	if not is_jumping and jump_buffer_timer > 0 and (grounded or coyote_timer > 0):
 		velocity.y = -jump_accel
 		is_jumping = true
+		jump_buffer_timer = 0
 
 	if Input.is_action_just_pressed("interact"):
 		check_for_interactables()
+
+	if Input.is_action_just_pressed("element_forward"):
+		current_element = (current_element + 1) % len(Element)
 
 	#shoot
 	if Input.is_action_just_pressed("fire"):
@@ -131,7 +138,7 @@ func check_for_interactables():
 		closest.interact()
 
 func shoot():
-		b = bullet.instance()
+		var b = bullet.instance()
 		get_parent().add_child(b)
 		b.global_position = $Position2D.global_position
 		if facing == FACING_LEFT:
