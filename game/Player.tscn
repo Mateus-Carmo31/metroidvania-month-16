@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://test_assets/spritesheet_double.png" type="Texture" id=1]
 [ext_resource path="res://Player.gd" type="Script" id=2]
@@ -10,8 +10,12 @@ height = 9.0
 [sub_resource type="RectangleShape2D" id=2]
 extents = Vector2( 22, 22 )
 
+[sub_resource type="RectangleShape2D" id=3]
+extents = Vector2( 4, 19 )
+
 [node name="Player" type="KinematicBody2D"]
 script = ExtResource( 2 )
+wall_grab_max_duration = 1.0
 
 [node name="sprite" type="Sprite" parent="."]
 position = Vector2( 0, -21 )
@@ -28,11 +32,32 @@ shape = SubResource( 1 )
 position = Vector2( 0, -21 )
 collision_layer = 8
 collision_mask = 8
-monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Interact"]
 position = Vector2( 0, -1 )
 shape = SubResource( 2 )
 
+[node name="WallCheckL" type="Area2D" parent="."]
+position = Vector2( -19, -21 )
+collision_layer = 32
+collision_mask = 16
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallCheckL"]
+position = Vector2( 1, 0 )
+shape = SubResource( 3 )
+
+[node name="WallCheckR" type="Area2D" parent="."]
+position = Vector2( 19, -21 )
+collision_layer = 32
+collision_mask = 16
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallCheckR"]
+position = Vector2( -1, 0 )
+shape = SubResource( 3 )
+
 [node name="Position2D" type="Position2D" parent="."]
 position = Vector2( 0, -21 )
+
+[node name="WallGrabTimer" type="Timer" parent="."]
+process_mode = 0
+one_shot = true

@@ -33,6 +33,7 @@ _global_script_class_icons={
 [application]
 
 config/name="MvM Jam 16"
+run/main_scene="res://Level.tscn"
 config/icon="res://icon.png"
 
 [input]
@@ -94,6 +95,8 @@ element_backward={
 2d_physics/layer_2="objects"
 2d_physics/layer_3="enemies"
 2d_physics/layer_4="interactables"
+2d_physics/layer_5="grass_walls"
+2d_physics/layer_6="misc"
 
 [physics]
 

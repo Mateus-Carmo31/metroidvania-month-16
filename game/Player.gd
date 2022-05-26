@@ -13,13 +13,20 @@ export var jump_accel				: float = 400
 export var jump_hold_factor			: float = 0.4
 export var coyote_time_window		: int	= 7
 export var jump_buffer_window		: int	= 4
+export var wall_grab_max_duration	: float	= 0.2
 export var wall_jump_buffer_window	: int	= 3
 
+var input_active := true
 var velocity : Vector2
+
 var is_jumping : bool = false
 var jump_key_held : bool = false
 var coyote_timer : float = 0
 var jump_buffer_timer : float = 0
+
+var is_wall_grabbing : bool = false
+var last_wall = null
+var wall_jump_buffer_timer : float = 0
 
 enum {FACING_LEFT, FACING_RIGHT, FACING_UP, FACING_DOWN}
 var facing = FACING_RIGHT
@@ -35,7 +42,7 @@ var current_element = 0
 # TODO: find some way to reduce slide
 
 func _ready():
-	pass
+	$WallGrabTimer.connect("timeout", self, "stop_wallgrab")
 
 func _physics_process(delta):
 
@@ -51,6 +58,7 @@ func _physics_process(delta):
 
 	if Input.is_action_just_pressed("jump"):
 		jump_buffer_timer = jump_buffer_window
+		wall_jump_buffer_timer = wall_jump_buffer_window
 		jump_key_held = true
 
 	if Input.is_action_just_released("jump"):
@@ -68,7 +76,8 @@ func _physics_process(delta):
 		# Doesn't damp speed while in air; instead, just clamp it to the max speed. Allows for very predictable jumps
 		velocity.x = clamp(velocity.x, -air_speed, air_speed)
 
-	_process_input(input, is_on_floor(), delta)
+	if input_active:
+		_process_input(input, is_on_floor(), delta)
 
 	# print(velocity.length())
 	velocity = move_and_slide_with_snap(velocity, -get_floor_normal() * 10 if not is_jumping else Vector2.ZERO, Vector2.UP, true)
@@ -83,15 +92,18 @@ func _physics_process(delta):
 		else:
 			velocity.y += gravity * jump_hold_factor * delta
 	else:
+
+		# Reset things that need resetting when touching the ground here!
 		if not touched_floor:
 			touched_floor = true
 
 		is_jumping = false
 		coyote_timer = coyote_time_window
-
+		stop_wallgrab(true)
 
 	coyote_timer = max(coyote_timer - 1, 0)
 	jump_buffer_timer = max(jump_buffer_timer - 1, 0)
+	wall_jump_buffer_timer = max(wall_jump_buffer_timer - 1, 0)
 
 
 func _process_input(input : Vector2, grounded : bool, delta : float):
@@ -117,6 +129,9 @@ func _process_input(input : Vector2, grounded : bool, delta : float):
 
 	if Input.is_action_just_pressed("element_forward"):
 		current_element = (current_element + 1) % len(Element)
+		print("Current element: ", Element.keys[current_element])
+
+	do_wall_grab(input, delta)
 
 	#shoot
 	if Input.is_action_just_pressed("fire"):
@@ -136,6 +151,47 @@ func check_for_interactables():
 				dist = i_dist
 
 		closest.interact()
+
+func do_wall_grab(input, _delta):
+
+	grab_wall(input)
+
+	if is_wall_grabbing:
+		velocity.y = 0
+
+		if input.x != 0 and sign(input.x) != sign(last_wall.position.x - position.x):
+			stop_wallgrab()
+			return
+
+		if wall_jump_buffer_timer > 0:
+			if last_wall.position.x - position.x > 0:
+				velocity = Vector2(-1, -1).normalized() * 400
+			else:
+				velocity = Vector2( 1, -1).normalized() * 400
+
+			stop_wallgrab()
+
+func stop_wallgrab(remove_wall = false):
+	$WallGrabTimer.stop()
+	is_wall_grabbing = false
+	if remove_wall:
+		last_wall = null
+
+func grab_wall(input):
+
+	var walls
+
+	if input.x > 0:
+		walls = $WallCheckR.get_overlapping_bodies()
+	elif input.x < 0:
+		walls = $WallCheckL.get_overlapping_bodies()
+
+	if walls:
+		if walls[0] != last_wall:
+			last_wall = walls[0]
+			if is_wall_grabbing == false:
+				$WallGrabTimer.start(wall_grab_max_duration)
+			is_wall_grabbing = true
 
 func shoot():
 		var b = bullet.instance()
