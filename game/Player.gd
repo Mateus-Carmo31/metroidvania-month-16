@@ -37,7 +37,7 @@ enum Element {None, Fire, Grass, Ice}
 var current_element = 0
 
 # TODO: add player element state!
-# TODO: increase player size
+# TODO: work on making the wall jump nicer
 # TODO: add firing
 # TODO: find some way to reduce slide
 
@@ -128,8 +128,10 @@ func _process_input(input : Vector2, grounded : bool, delta : float):
 		check_for_interactables()
 
 	if Input.is_action_just_pressed("element_forward"):
+		if current_element == Element.Grass:
+			stop_wallgrab()
 		current_element = (current_element + 1) % len(Element)
-		print("Current element: ", Element.keys[current_element])
+		print("Current element: ", Element.keys()[current_element])
 
 	do_wall_grab(input, delta)
 
@@ -154,15 +156,22 @@ func check_for_interactables():
 
 func do_wall_grab(input, _delta):
 
-	grab_wall(input)
+	if not is_wall_grabbing and current_element == Element.Grass:
+		try_grab_wall(input)
+	elif is_wall_grabbing:
 
-	if is_wall_grabbing:
+		# This is to avoid a bug when a player falls onto a wall while being pushed away from it, causing it to slide in the air
+		# Just zeroing horizontal velocity kinda solves it, but changing the wall perception area and thinking about it during level design is key
+		if sign(velocity.x) != sign(last_wall.position.x - position.x):
+			velocity.x = 0
 		velocity.y = 0
 
-		if input.x != 0 and sign(input.x) != sign(last_wall.position.x - position.x):
+		# Stop wallgrab if the player goes on a different direction
+		if input.x != 0 and (sign(input.x) != sign(last_wall.position.x - position.x) or current_element != Element.Grass):
 			stop_wallgrab()
 			return
 
+		# Wall Jump
 		if wall_jump_buffer_timer > 0:
 			if last_wall.position.x - position.x > 0:
 				velocity = Vector2(-1, -1).normalized() * 400
@@ -177,20 +186,17 @@ func stop_wallgrab(remove_wall = false):
 	if remove_wall:
 		last_wall = null
 
-func grab_wall(input):
+func try_grab_wall(input):
 
-	var walls
+	var walls = []
 
-	if input.x > 0:
-		walls = $WallCheckR.get_overlapping_bodies()
-	elif input.x < 0:
-		walls = $WallCheckL.get_overlapping_bodies()
+	walls += $WallCheckR.get_overlapping_bodies()
+	walls += $WallCheckL.get_overlapping_bodies()
 
 	if walls:
 		if walls[0] != last_wall:
 			last_wall = walls[0]
-			if is_wall_grabbing == false:
-				$WallGrabTimer.start(wall_grab_max_duration)
+			$WallGrabTimer.start(wall_grab_max_duration)
 			is_wall_grabbing = true
 
 func shoot():
