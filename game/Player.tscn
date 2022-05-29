@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=2]
 
-[ext_resource path="res://test_assets/spritesheet_double.png" type="Texture" id=1]
+[ext_resource path="res://Rig.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Player.gd" type="Script" id=2]
 
 [sub_resource type="CapsuleShape2D" id=1]
@@ -17,18 +17,16 @@ extents = Vector2( 4, 12 )
 script = ExtResource( 2 )
 wall_grab_max_duration = 1.0
 
-[node name="sprite" type="Sprite" parent="."]
-position = Vector2( 0, -21 )
-scale = Vector2( 0.102, 0.129 )
-texture = ExtResource( 1 )
-region_enabled = true
-region_rect = Rect2( 1063.59, 943.029, 327.004, 331.128 )
+[node name="Rig" parent="." instance=ExtResource( 1 )]
+position = Vector2( 0, -18 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
 position = Vector2( 0, -21 )
 shape = SubResource( 1 )
 
 [node name="Interact" type="Area2D" parent="."]
+visible = false
 position = Vector2( 0, -21 )
 collision_layer = 8
 collision_mask = 8
@@ -38,6 +36,7 @@ position = Vector2( 0, -1 )
 shape = SubResource( 2 )
 
 [node name="WallCheckL" type="Area2D" parent="."]
+visible = false
 position = Vector2( -19, -21 )
 collision_layer = 32
 collision_mask = 16
@@ -47,6 +46,7 @@ position = Vector2( 1, 0 )
 shape = SubResource( 3 )
 
 [node name="WallCheckR" type="Area2D" parent="."]
+visible = false
 position = Vector2( 19, -21 )
 collision_layer = 32
 collision_mask = 16

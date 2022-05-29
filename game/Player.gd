@@ -28,8 +28,12 @@ var is_wall_grabbing : bool = false
 var last_wall = null
 var wall_jump_buffer_timer : float = 0
 
-enum {FACING_LEFT, FACING_RIGHT, FACING_UP, FACING_DOWN}
+enum {FACING_LEFT, FACING_RIGHT}
 var facing = FACING_RIGHT
+var state_playback
+
+enum {LOOKING_NONE, LOOKING_UP, LOOKING_DOWN}
+var look_dir = LOOKING_NONE
 
 var touched_floor = false
 
@@ -43,6 +47,8 @@ var current_element = 0
 
 func _ready():
 	$WallGrabTimer.connect("timeout", self, "stop_wallgrab")
+	$Rig/AnimationTree.active = true
+	state_playback = $Rig/AnimationTree.get("parameters/playback")
 
 func _physics_process(delta):
 
@@ -50,11 +56,13 @@ func _physics_process(delta):
 		
 	if Input.is_action_pressed("move_left"):
 		input += Vector2.LEFT
-		facing = FACING_LEFT
+		if facing != FACING_LEFT:
+			set_facing(FACING_LEFT)
 
 	if Input.is_action_pressed("move_right"):
 		input += Vector2.RIGHT
-		facing = FACING_RIGHT
+		if facing != FACING_RIGHT:
+			set_facing(FACING_RIGHT)
 
 	if Input.is_action_just_pressed("jump"):
 		jump_buffer_timer = jump_buffer_window
@@ -89,12 +97,17 @@ func _physics_process(delta):
 		# Variable jump height by changing the gravity
 		if not jump_key_held or velocity.y > 0:
 			velocity.y += gravity * delta
+			state_playback.travel("Falling")
 		else:
 			velocity.y += gravity * jump_hold_factor * delta
 	else:
 
 		# Reset things that need resetting when touching the ground here!
 		if not touched_floor:
+			if velocity.x != 0:
+				state_playback.travel("Walk")
+			else:
+				state_playback.travel("Standing")
 			touched_floor = true
 
 		is_jumping = false
@@ -116,13 +129,17 @@ func _process_input(input : Vector2, grounded : bool, delta : float):
 	if input.length() > 0.1:
 		if grounded:
 			velocity += ground_accel * delta * dir
+			state_playback.travel("Walk")
 		else:
 			velocity += air_accel * delta * dir
+	elif grounded:
+		state_playback.travel("Standing")
 
 	if not is_jumping and jump_buffer_timer > 0 and (grounded or coyote_timer > 0):
 		velocity.y = -jump_accel
 		is_jumping = true
 		jump_buffer_timer = 0
+		state_playback.travel("Jump")
 
 	if Input.is_action_just_pressed("interact"):
 		check_for_interactables()
@@ -175,10 +192,13 @@ func do_wall_grab(input, _delta):
 		if wall_jump_buffer_timer > 0:
 			if last_wall.position.x - position.x > 0:
 				velocity = Vector2(-1, -1).normalized() * 400
+				set_facing(FACING_LEFT)
 			else:
 				velocity = Vector2( 1, -1).normalized() * 400
+				set_facing(FACING_RIGHT)
 
 			stop_wallgrab()
+			state_playback.travel("Jump")
 
 func stop_wallgrab(remove_wall = false):
 	$WallGrabTimer.stop()
@@ -209,3 +229,11 @@ func shoot():
 			b.dir = Vector2(0,-1) 
 		if Input.is_action_pressed("look_down") and not is_on_floor():
 			b.dir = Vector2(0,1) 
+
+func set_facing(face):
+	if face == FACING_LEFT:
+		$Rig.scale.x = -1
+	elif face == FACING_RIGHT:
+		$Rig.scale.x = 1
+
+	facing = face
