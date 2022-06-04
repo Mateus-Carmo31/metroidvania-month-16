@@ -12,17 +12,17 @@ _global_script_classes=[ {
 "base": "Area2D",
 "class": "Door",
 "language": "GDScript",
-"path": "res://Door.gd"
+"path": "res://src/scripts/Door.gd"
 }, {
 "base": "Reference",
 "class": "MathUtils",
 "language": "GDScript",
-"path": "res://MathUtils.gd"
+"path": "res://src/scripts/MathUtils.gd"
 }, {
 "base": "KinematicBody2D",
 "class": "Player",
 "language": "GDScript",
-"path": "res://Player.gd"
+"path": "res://src/scripts/Player.gd"
 } ]
 _global_script_class_icons={
 "Door": "",
@@ -33,8 +33,15 @@ _global_script_class_icons={
 [application]
 
 config/name="MvM Jam 16"
-run/main_scene="res://Level.tscn"
+run/main_scene="res://src/scenes/Level.tscn"
 config/icon="res://icon.png"
+
+[display]
+
+window/size/borderless=true
+window/size/fullscreen=true
+window/stretch/mode="2d"
+window/stretch/aspect="keep"
 
 [input]
 

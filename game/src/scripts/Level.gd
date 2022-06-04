@@ -1,10 +1,10 @@
 extends Node2D
 
-const PLAYER_SCENE = preload("res://Player.tscn")
+const PLAYER_SCENE = preload("res://src/scenes/Player.tscn")
 const LEVELS = {
-	"test_room1": preload("res://RoomTest1.tscn"),
-	"test_room2": preload("res://RoomTest2.tscn"),
-	"test_area1": preload("res://TestArea.tscn")
+	"test_room1": preload("res://src/scenes/rooms/RoomTest1.tscn"),
+	"test_room2": preload("res://src/scenes/rooms/RoomTest2.tscn"),
+	"test_area1": preload("res://src/scenes/rooms/TestArea.tscn")
 }
 
 export var current_room = "test_room1"

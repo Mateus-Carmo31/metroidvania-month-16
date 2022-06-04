@@ -1,6 +1,6 @@
 extends KinematicBody2D
 
-onready var bullet = preload("res://Bullet.tscn")
+onready var bullet = preload("res://src/scenes/Bullet.tscn")
 class_name Player
 
 export var ground_accel				: float = 800
@@ -32,7 +32,7 @@ enum {FACING_LEFT, FACING_RIGHT}
 var facing = FACING_RIGHT
 var state_playback
 
-enum {LOOKING_NONE, LOOKING_UP, LOOKING_DOWN}
+enum {LOOKING_UP = -1, LOOKING_NONE, LOOKING_DOWN}
 var look_dir = LOOKING_NONE
 
 var touched_floor = false
@@ -63,6 +63,13 @@ func _physics_process(delta):
 		input += Vector2.RIGHT
 		if facing != FACING_RIGHT:
 			set_facing(FACING_RIGHT)
+
+	# if Input.is_action_pressed("look_up"):
+	# 	look_dir = LOOKING_UP
+	# elif Input.is_action_pressed("look_down"):
+	# 	look_dir = LOOKING_DOWN
+	# else:
+	# 	look_dir = LOOKING_NONE
 
 	if Input.is_action_just_pressed("jump"):
 		jump_buffer_timer = jump_buffer_window

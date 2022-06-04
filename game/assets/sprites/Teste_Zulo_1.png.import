@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/Teste_Zulo_1.png-d4b0517df3db6ebbd13a26a2a65e2df3.stex"
+path="res://.import/Teste_Zulo_1.png-ffcd6dd09404a79bc93eb72d27e87716.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Teste_Zulo_1.png"
-dest_files=[ "res://.import/Teste_Zulo_1.png-d4b0517df3db6ebbd13a26a2a65e2df3.stex" ]
+source_file="res://assets/sprites/Teste_Zulo_1.png"
+dest_files=[ "res://.import/Teste_Zulo_1.png-ffcd6dd09404a79bc93eb72d27e87716.stex" ]
 
 [params]
 
